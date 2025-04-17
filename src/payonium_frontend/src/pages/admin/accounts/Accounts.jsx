@@ -17,7 +17,7 @@ function Accounts() {
   let backend = createActor(canisterId, {
     agentOptions: {
       identity: identity,
-      host: "host",
+      host: host,
     },
   });
 
