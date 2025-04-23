@@ -1,5 +1,5 @@
 //Gustavo Fuentes Gonzales
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { createActor } from 'declarations/payonium_backend';
 import styles from './Profile.module.css';
@@ -44,7 +44,7 @@ function Profile() {
     setPrincipal(principal.toString());
   }
 
-  async function handleGetUserProfile() {
+  async function handleGetUserProfile(showAlert = true) {
     if (!isAuthenticated) {
       alert("Debe estar logueado para obtener el perfil.");
       return;
@@ -61,7 +61,7 @@ function Profile() {
         console.log('Perfil recibido:', result.ok.profile);
         setUserProfile(result.ok.profile);
         setError(null);
-      } else {
+      } else if(showAlert){
         alert("No se encontró el perfil del usuario.");
       }
     } catch (err) {
@@ -85,50 +85,17 @@ function Profile() {
     try {
       console.log(newProfile);
       const result = await backend.registerUserAdd(newProfile);
-      if (result) {
+      if (result && result.ok) {    //result
         alert("usuario registrado exitosamente");
 
       } else {
-        alert("error en el registro: " + result.err)
+        alert("error en el registro: " + (result?.err ?? "desconocido"));
       };
     } catch (err) {
       console.log(err)
     }
 
   }
-
-  //Manejando cuentas
-
-  async function getMyAccount() {
-    if (!isAuthenticated) {
-      alert("Debe estar logueado para obtener el perfil.");
-      return;
-    }
-
-    const userPrincipalText = identity.getPrincipal().toText(); // Obtener el Principal en formato texto
-
-    try {
-      // Llamar al backend para obtener el perfil asociado a ese Principal (usando el texto del Principal)
-      console.log("respuesta a analizar")
-      const result = await backend.getMyAccounts(userPrincipalText); // Llamar a la nueva función en el backend
-      console.log(result);
-
-      if (result.ok && result.ok.accounts && result.ok.accounts.length > 0) {
-        console.log('Cuenta recibida:', result.ok.account);
-        setUserAccount(result.ok.accounts);  // Guardamos el perfil del usuario logueado
-        setError(null);  // Limpiar errores si la solicitud es exitosa
-      } else {
-        alert("No se encontró la cuenta del usuario.");
-
-        // if (!userAccount || !userAccount.name) {
-        //   return <div>No se pudo cargar la cuenta correctamente.</div>;
-        // }
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
 
   // Función para verificar si el usuario está activo
   async function isUserActive() {
@@ -154,6 +121,92 @@ function Profile() {
       setUserStatus("Error al verificar el estado del usuario");
     }
   }
+
+  //Manejando cuentas
+
+  //Funcion para obtener las propias cuentas
+  async function getMyAccount(showAlert = true) {
+    if (!isAuthenticated) {
+      alert("Debe estar logueado para obtener el perfil.");
+      return;
+    }
+
+    const userPrincipalText = identity.getPrincipal().toText(); // Obtener el Principal en formato texto
+
+    try {
+      // Llamar al backend para obtener el perfil asociado a ese Principal (usando el texto del Principal)
+      console.log("respuesta a analizar")
+      const result = await backend.getMyAccounts(userPrincipalText); // Llamar a la nueva función en el backend
+      console.log(result);
+
+      if (result.ok && result.ok.accounts && result.ok.accounts.length > 0) {
+        console.log('Cuenta recibida:', result.ok.account);
+        setUserAccount(result.ok.accounts);  // Guardamos el perfil del usuario logueado
+        setError(null);  // Limpiar errores si la solicitud es exitosa
+      } else if(showAlert){
+        alert("No se encontró la cuenta del usuario.");
+
+        // if (!userAccount || !userAccount.name) {
+        //   return <div>No se pudo cargar la cuenta correctamente.</div>;
+        // }
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  //Funcion para adicionar cuentas propias
+  const [formAccount, setFormAccount] = useState({
+    longaccountnumber: '',
+    namebankaccount: '',
+    simpleaccountnumber: '',
+    depositcurrency: '',
+    owner: '',
+  })
+
+  async function registerAccount(event) {
+    event.preventDefault();
+    if (!isAuthenticated) {
+      alert("Debe estar logueado para verificar el estado del usuario.");
+      return;
+    }
+
+    const newAccount = {
+      ...formAccount,
+      owner: identity.getPrincipal(),    //.toText(),
+    }
+    
+    try{
+      const result = await backend.addAccount(newAccount);
+      if(result && result.ok){    //result.ok
+        alert("Cuenta registrada exitosamente")
+        setFormAccount({
+          longaccountnumber: '',
+          simpleaccountnumber: '',
+          namebankaccount: '',
+          depositcurrency: '',
+        })
+      } else {
+        alert("Error al registrar la cuenta" + (result?.err ?? "desconocido"));
+      }
+    } catch (err){
+      console.error(err);
+      alert("Error en el proceso")
+    }
+  }
+
+  function handleAccountChange(e) {
+    const { name, value } = e.target;
+    setFormAccount(prev => ({...prev, [name]: value,}))               //7mo video 29:16
+  }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      handleGetUserProfile(false);
+      getMyAccount(false);
+      isUserActive();
+    }
+  }, [isAuthenticated]);
 
   return (
     <div className={styles.container}>
@@ -185,7 +238,7 @@ function Profile() {
           </div>
 
         </form>
-
+      
 
         <div>
 
@@ -217,6 +270,19 @@ function Profile() {
           <button onClick={isUserActive}>Check if User is Active</button>
           {userStatus && <div id="principal" className={styles.userStatus}>{userStatus}</div>}
         </div>
+
+        <label>User account</label>
+        <form onSubmit={registerAccount}>
+          <input type="text" name="longaccountnumber" placeholder="Long Account Number" value={formAccount.longaccountnumber} onChange={handleAccountChange} />
+          <input type="text" name="simpleaccountnumber" placeholder="Simple Account Number" value={formAccount.simpleaccountnumber} onChange={handleAccountChange} />
+          <input type="text" name="namebankaccount" placeholder="Name Bank Account" value={formAccount.namebankaccount} onChange={handleAccountChange} />
+          <input type="text" name="depositcurrency" placeholder="Deposit Currency" value={formAccount.depositcurrency} onChange={handleAccountChange} />
+
+          <button type="submit">Confirm</button>
+        </form>
+
+
+
 
         <div>
           <button onClick={getMyAccount}>Get my accounts</button>
