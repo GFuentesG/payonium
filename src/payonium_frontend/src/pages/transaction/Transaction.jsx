@@ -1,5 +1,5 @@
 //Gustavo Fuentes Gonzales
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { createActor } from 'declarations/payonium_backend';
 import styles from './Transaction.module.css';
@@ -138,8 +138,7 @@ function Transaction() {
     }
   }
 
-  //Funcion para obtener las ordenes propias a pagar   //// REVISAR
-  
+  //Funcion para obtener las ordenes propias a pagar
   async function handleGetMyIncomingOrdersByDni() {
     if (!isAuthenticated) {
       alert("Debe estar logueado.");
@@ -148,12 +147,10 @@ function Transaction() {
     try {
       const response = await backend.getMyIncomingOrdersByDni();
       const orders = response.ok.orders;
-      console.log("Órdenes por DNI:", orders);
+      //console.log("Órdenes por DNI:", orders);
       setMyIncomingOrders(orders);
-      //setOrderResult("Órdenes obtenidas exitosamente.");
     } catch (err) {
-      console.log(err);
-      //setOrderResult("Error al obtener las órdenes por DNI.");
+      console.log("Error al obtener órdenes asignadas:", err);
     }
   }
 
@@ -215,6 +212,14 @@ function Transaction() {
       alert("Error al actualizar el estado.");
     }
   }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      handleGetMyOrders();
+      handleGetMyIncomingOrdersByDni();
+    }
+  }, [isAuthenticated]);
+
 
   return (
     <div className={styles.container}>
