@@ -272,24 +272,55 @@ function Transaction() {
 
 
 
-        <div>
+        <div className={styles.orderSection}>
           <h3>My Created Orders</h3>
           <button onClick={handleGetMyOrders}>Get My Orders</button>
-          <ul>
+
+          <div className={styles.orderTable}>
+            <div className={styles.orderHeader}>
+              <div>DNI</div>
+              <div>Description</div>
+              <div>Email</div>
+              <div>Amount</div>
+              <div>Currency</div>
+            </div>
+
             {myOrders.map((order, index) => (
-              <li key={index}>{order.dni} - {order.description} - {order.email} - {Number(order.amount)} - {order.currency}</li>
+              <div key={index} className={styles.orderRow}>
+                <div>{order.dni}</div>
+                <div>{order.description}</div>
+                <div>{order.email}</div>
+                <div>{Number(order.amount)}</div>
+                <div>{order.currency}</div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
-        <div>
+
+        <div className={styles.orderSection}>
           <h3>My Payment Orders</h3>
           <button onClick={handleGetMyIncomingOrdersByDni}>Get My Orders Received</button>
-          <ul>
+
+          <div className={styles.orderTable}>
+            <div className={styles.orderHeader}>
+              <div>DNI</div>
+              <div>Description</div>
+              <div>Email</div>
+              <div>Amount</div>
+              <div>Currency</div>
+            </div>
+
             {myIncomingOrders.map((order, index) => (
-              <li key={index}>{order.dni} - {order.description} - {order.email} - {Number(order.amount)} - {order.currency}</li>
+              <div key={index} className={styles.orderRow}>
+                <div>{order.dni}</div>
+                <div>{order.description}</div>
+                <div>{order.email}</div>
+                <div>{Number(order.amount)}</div>
+                <div>{order.currency}</div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
 

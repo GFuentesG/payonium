@@ -177,6 +177,7 @@ actor {
 
   };
 
+  //Funcion de referencia para otras funciones
   // public shared (msg) func getAllOrders2() : async Types.GetOrderResult {
   //   if (Principal.isAnonymous(msg.caller)) return #err(#userNotAuthenticated);
   //   Debug.print("Principal que llama desde main: " # Principal.toText(msg.caller));
@@ -206,32 +207,11 @@ actor {
     return #ok(#orders(orderResult));
   };
 
-  //Funcion para obtener la(s) propia(s) orden(es) - OLD (referencial: servira para otros llamados combinados)
-  // public shared (msg) func getMyOrder(userDni : Text) : async Types.GetOrderResult {
-  //   if (Principal.isAnonymous(msg.caller)) return #err(#userNotAuthenticated);
-
-  //   Debug.print("Principal que llama desde main: " # Principal.toText(msg.caller));
-
-  //   let maybeProfile = Map.get(profiles, thash, userDni);
-
-  //   switch (maybeProfile) {
-  //     case (null) {
-  //       return #err(#userDoesNotExist);
-  //     };
-  //     case (?profile) {
-
-  //       let userOrder = await Data.getOrderByPrincipal(profile.owner);
-  //       return #ok(#orders(userOrder));
-  //     };
-  //   };
-
-  // };
-
   //  Funcion para obtener la(s) orden(es) recibidas
   public shared (msg) func getMyIncomingOrdersByDni() : async Types.GetOrderResult {
     if (Principal.isAnonymous(msg.caller)) return #err(#userNotAuthenticated);
 
-    Debug.print("Principal que llama desde main: " # Principal.toText(msg.caller));
+    //Debug.print("Principal que llama desde main: " # Principal.toText(msg.caller));
 
     let maybeProfile = Map.get(profiles, thash, Principal.toText(msg.caller));
 
