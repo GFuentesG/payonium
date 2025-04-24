@@ -46,6 +46,9 @@ function Transaction() {
     city: '',
   });
 
+  const [myOrders, setMyOrders] = useState([]);
+  const [myIncomingOrders, setMyIncomingOrders] = useState([]);
+
   // Función para registrar una orden
   async function handleRegisterOrder(e) {
     e.preventDefault();
@@ -119,6 +122,45 @@ function Transaction() {
     }
   }
 
+  //Funcion para obtener las ordenes propias generadas (busqueda por el Principal)
+  async function handleGetMyOrders() {
+    if (!isAuthenticated) {
+      alert("Debe estar logueado.");
+      return;
+    }
+
+    try {
+      const response = await backend.getMyOrdersByPrincipal() //identity.getPrincipal().toText());
+      const orders = response.ok.orders;
+      setMyOrders(orders);
+    } catch (err) {
+      console.error("Error al obtener órdenes propias:", err);
+    }
+  }
+
+  //Funcion para obtener las ordenes propias a pagar   //// REVISAR
+  
+  async function handleGetMyIncomingOrdersByDni() {
+    if (!isAuthenticated) {
+      alert("Debe estar logueado.");
+      return;
+    }
+    try {
+      const response = await backend.getMyIncomingOrdersByDni();
+      const orders = response.ok.orders;
+      console.log("Órdenes por DNI:", orders);
+      setMyIncomingOrders(orders);
+      //setOrderResult("Órdenes obtenidas exitosamente.");
+    } catch (err) {
+      console.log(err);
+      //setOrderResult("Error al obtener las órdenes por DNI.");
+    }
+  }
+
+
+
+
+
   //Envio de datos para los depositos directos al Banco
   const handleDepositChange = (e) => {
     const { name, value } = e.target;
@@ -128,6 +170,7 @@ function Transaction() {
     });
   };
 
+  //Funcion para registrar un deposito
   async function handleRegisterDeposit(e) {
     e.preventDefault();
     if (!isAuthenticated) {
@@ -150,7 +193,7 @@ function Transaction() {
       if (result) {
         alert("Depósito registrado exitosamente.");
       } else {
-        alert("Error al registrar el depósito.");
+        alert("Error al registrar el depósito");
       }
     } catch (err) {
       console.log(err);
@@ -218,6 +261,39 @@ function Transaction() {
           )}
         </div>
 
+
+
+
+
+
+
+        <div>
+          <h3>My Created Orders</h3>
+          <button onClick={handleGetMyOrders}>Get My Orders</button>
+          <ul>
+            {myOrders.map((order, index) => (
+              <li key={index}>{order.dni} - {order.description} - {order.email} - {Number(order.amount)} - {order.currency}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h3>My Payment Orders</h3>
+          <button onClick={handleGetMyIncomingOrdersByDni}>Get My Orders Received</button>
+          <ul>
+            {myIncomingOrders.map((order, index) => (
+              <li key={index}>{order.dni} - {order.description} - {order.email} - {Number(order.amount)} - {order.currency}</li>
+            ))}
+          </ul>
+        </div>
+
+
+
+
+
+
+
+
         <div className={styles.orderQueryWrapper}>
 
           <form onSubmit={(e) => { e.preventDefault(); handleGetOrdersByDni(); }}>
@@ -268,8 +344,8 @@ function Transaction() {
 
       <div>
 
-        <h2>Here you can make your cash load</h2>
-        <RampWidget />
+        <h2>Here you can make your cash load</h2>    {/*  //descomentar esta seccion*/}
+        {/* <RampWidget /> */}
 
       </div>
 

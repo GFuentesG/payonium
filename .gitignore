@@ -26,6 +26,7 @@ node_modules/
 dist/
 .svelte-kit/
 *.vite/
+**/newmodule.css
 
 # backend code
 **/mainbackup.mo
