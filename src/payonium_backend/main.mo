@@ -96,19 +96,16 @@ actor {
     };
   };
 
-
-// Buscar un perfil por DNI
-public query func getUserProfileByDni(dni: Text): async Types.GetProfileResult {
-  // Recorremos todos los perfiles para encontrar uno con el dni especificado
-  for ((_, profile) in Map.entries(profiles)) {
-    if (profile.dni == dni) {
-      return #ok(#profile(profile));
+  // Buscar un perfil por DNI (revisar otra forma en caso de una cantidad mayor de perfiles)
+  public query func getUserProfileByDni(dni : Text) : async Types.GetProfileResult {
+    // Recorremos todos los perfiles para encontrar uno con el dni especificado
+    for ((_, profile) in Map.entries(profiles)) {
+      if (profile.dni == dni) {
+        return #ok(#profile(profile));
+      };
     };
+    return #err(#userDoesNotExist);
   };
-  return #err(#userDoesNotExist);
-};
-
-
 
   //Funcion para validar si el usuario esta activo
   public shared ({ caller }) func isUserActive(principal : Text) : async Bool {
