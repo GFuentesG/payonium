@@ -3,7 +3,7 @@ import { AuthContext } from '../../../context/AuthContext';
 import { createActor } from 'declarations/payonium_backend';
 import styles from '../../profile/Profile.module.css';
 
-function profiles() {
+function Profiles() {
 
 
 
@@ -40,31 +40,36 @@ function profiles() {
   const [error, setError] = useState(null);
   const [userStatus, setUserStatus] = useState('');
 
+  const [searchDni, setSearchDni] = useState('');
+
   async function handleWhoAmI() {
     const principal = await backend.whoAmI();
     console.log("prueba");
     setPrincipal(principal.toString());
   }
 
-  async function handleGetUserProfile() {
+  async function handleGetUserProfileByDni() {
     if (!isAuthenticated) {
       alert("Debe estar logueado para obtener el perfil.");
       return;
     }
 
-    const userPrincipalText = identity.getPrincipal().toText(); // Obtener el Principal en formato texto
+    if (!searchDni) {
+      alert("Ingrese un DNI para buscar.");
+      return;
+    }
 
     try {
-      // Llamar al backend para obtener el perfil asociado a ese Principal (usando el texto del Principal)
-      console.log("respuesta a analizar")
-      const result = await backend.getMyProfile(userPrincipalText); // Llamar a la nueva función en el backend
-      console.log(result);
+      //console.log("respuesta a analizar")
+      const result = await backend.getUserProfileByDni(searchDni); // Llamar a la nueva función en el backend
+      //console.log(result);
 
       if (result.ok && result.ok.profile) {
-        console.log('Perfil recibido:', result.ok.profile);
+        //console.log('Perfil recibido:', result.ok.profile);
         setUserProfile(result.ok.profile);  // Guardamos el perfil del usuario logueado
         setError(null);  // Limpiar errores si la solicitud es exitosa
       } else {
+        setUserProfile(null);
         alert("No se encontró el perfil del usuario.");
       }
     } catch (err) {
@@ -235,7 +240,8 @@ function profiles() {
           <br />
 
           <div className={styles.profileSection}>
-            <button onClick={handleGetUserProfile}>Get user profile by DNI</button>
+            <input  className={styles.inputField} type="text" placeholder="Buscar perfil por DNI" value={searchDni} onChange={(e) => setSearchDni(e.target.value)} />
+            <button onClick={handleGetUserProfileByDni}>Get user profile by DNI</button>
           </div>
 
           {error && <div className={styles.error}>{error}</div>}  {/* Mostrar error si ocurre */}
@@ -270,4 +276,4 @@ function profiles() {
 
 
 
-export default profiles
+export default Profiles

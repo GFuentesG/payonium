@@ -34,7 +34,7 @@ actor Data {
         //query  shared ({caller})
         //if (Principal.isAnonymous(caller)) return #err(#userNotAuthenticated);
 
-        Debug.print("Principal que llama desde data: " # Principal.toText(owner));
+        //Debug.print("Principal que llama desde data: " # Principal.toText(owner));
 
         let userAccounts = Array.filter<Types.Account>(accounts, func(account) { account.owner == owner });
 
@@ -145,7 +145,7 @@ actor Data {
 
     public query func getOrderByPrincipal(owner : Principal) : async [Types.Order] {
         //if (Principal.isAnonymous(caller)) return #err(#userNotAuthenticated);
-        Debug.print("Principal que llama desde data: " # Principal.toText(owner));
+        //Debug.print("Principal que llama desde data: " # Principal.toText(owner));
         let userOrders = Array.filter<Types.Order>(orders, func(order) { order.owner == owner });
         return userOrders;
 

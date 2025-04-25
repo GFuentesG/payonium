@@ -107,3 +107,10 @@
 }
 
 
+.inputField {
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}

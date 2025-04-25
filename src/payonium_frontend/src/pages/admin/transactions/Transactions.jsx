@@ -169,13 +169,27 @@ function Transactions() {
             {ordersDni.length > 0 ? (
               <ul>
                 {ordersDni.map((order, index) => (
-                  <li key={index}>
+                  <li key={index} className={styles.orderItem}>
                     <div className="order-item">
                       <p><strong>DNI:</strong> {order.dni}</p>
                       <p><strong>Description:</strong> {order.description}</p>
                       <p><strong>Email:</strong> {order.email}</p>
                       <p><strong>Amount:</strong> {Number(order.amount)}</p>
                       <p><strong>Currency:</strong> {order.currency}</p>
+                    </div>
+
+                    {/* Aquí agregamos el estado de la transacción de forma independiente */}
+                    <div className={styles.statusWrapper}>
+                      <div className={styles.statusSection}>
+                        <p
+                          className={
+                            order.status === "pendiente" ? styles.statusPending :
+                              order.status === "procesándose" ? styles.statusProcessing :
+                                order.status === "pago-recibido" ? styles.statusCompleted : ""}>
+                          <strong>Status:</strong> {order.status}
+                        </p>
+                        <button onClick={() => handleUpdateStatus(order.id)} className={styles.updateButton}>Actualizar</button>
+                      </div>
                     </div>
                   </li>
                 ))}
